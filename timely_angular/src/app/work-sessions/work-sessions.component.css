@@ -1,0 +1,19 @@
+h2 {
+    margin-left: 8%;
+    font-size: 3em;
+}
+
+table {
+    width: 100%;
+}
+
+button {
+    margin: 5% auto;
+    display: block;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+div {
+    width: 60%;
+    margin: auto;
+}
