@@ -6,7 +6,5 @@ log work sessions.
 
 Timely is a Spring Boot application built using Maven, with Angular frontend.
 
-<img width="640" alt="image" src="https://user-images.githubusercontent.com/80581909/195917272-dde3f989-0665-46e3-b5f2-dbb5d9d29255.png">
-<img width="640" alt="image" src="https://user-images.githubusercontent.com/80581909/195917813-c149c065-96ef-4b8e-8040-aa9cf81d8c17.png">
-
-
+<img width="640" alt="image" src="https://user-images.githubusercontent.com/80581909/196002980-8208684c-0825-4aca-9051-5a5fa421192f.png">
+<img width="1026" alt="image" src="https://user-images.githubusercontent.com/80581909/196003003-98caa1aa-07fe-4e8a-8aae-05b3b61a4007.png">
