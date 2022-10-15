@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { WorkSession } from './workSession';
-import { catchError, Observable, observable, of, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 
@@ -28,10 +28,20 @@ export class WorkService {
   }
 
   addWorkSession(workSession: WorkSession) {
-    return this.http.post<WorkSession>(this.timelyURL, workSession, this.httpOptions).pipe(
+    return this.http.post<WorkSession>(this.timelyURL, workSession).pipe(
       tap(_ => console.log('added new work session')),
       catchError(this.handleError<WorkSession>('addWorkSession'))
     );
+  }
+
+  deleteSession(session: WorkSession | string): Observable<WorkSession> {
+    const name = typeof session === 'string' ? session : session.name;
+    const url = `${this.timelyURL}/${name}`;
+
+    return this.http.delete<WorkSession>(url).pipe(
+      tap(_ => console.log(`deleted session ${name}`)),
+      catchError(this.handleError<WorkSession>('deleteSession'))
+      );
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

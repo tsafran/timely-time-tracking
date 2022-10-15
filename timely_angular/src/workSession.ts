@@ -1,12 +1,12 @@
 export interface WorkSession {
-    name: String;
-    startTime: String;
-    endTime: String;
+    name: string;
+    startTime: string;
+    endTime: string;
 }
 
 export interface WorkSessionRow {
-    name: String;
-    startTime: String;
-    endTime: String;
-    duration: String;
+    name: string;
+    startTime: string;
+    endTime: string;
+    duration: string;
 }

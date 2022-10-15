@@ -26,7 +26,7 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: String[] = ['project', 'startTime', 'endTime', 'duration'];
+  displayedColumns: String[] = ['project', 'startTime', 'endTime', 'duration', 'action'];
   dataSource = new MatTableDataSource<WorkSessionRow>(this.sessions);
 
   constructor(private workService: WorkService, private dialog: MatDialog) { }
@@ -48,20 +48,41 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
       this.dataSource.data = this.sessions;
   }
 
+  delete(row: WorkSessionRow): void {
+    if (row.name != '...'){
+      this.workService.deleteSession(row.name).subscribe(_ => this.getSessions());
+    } else {
+      if (this.isRecording) {
+        this.isRecording = !this.isRecording;
+        this.getSessions();
+      }
+    }
+    this.refreshStartButton(); 
+  }
+
+  refreshStartButton(): void {
+    if (this.isRecording) {
+      this.buttonText = "Stop";
+      this.buttonColor = "warn";
+    }
+    else {
+      this.buttonText = "Start";
+      this.buttonColor = "primary";
+    }
+  }
+
   toggleStart(): void{
-    this.buttonText = "Stop";
-    this.buttonColor = "warn";
     if(!this.isRecording) {
       this.currentStart = new Date;
       this.sessions.push(
         {name: "...", startTime: this.formatDate(this.currentStart), endTime: "...", duration: "..."} as WorkSessionRow);
-        
     } 
     else {
       this.openDialog();
     }
     this.isRecording = !this.isRecording; 
     this.dataSource.data = this.sessions
+    this.refreshStartButton();
   }
 
   openDialog(): void{
@@ -78,8 +99,7 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
       this.currentStop = result.endTime;
       this.workService.addWorkSession({name: this.currentName, startTime: this.currentStart.toJSON(), endTime: this.currentStop.toJSON()} as WorkSession)
       .subscribe(_ => this.getSessions());
-      this.buttonText = "Start";
-      this.buttonColor = "primary";
+      this.refreshStartButton();
     })
   }
 
@@ -102,7 +122,7 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  timeBetweenDates(s1: String, s2: String){
+  timeBetweenDates(s1: string, s2: string){
 
     const[date1, time1] = s1.split(' ');
     const[date2, time2] = s2.split(' ');

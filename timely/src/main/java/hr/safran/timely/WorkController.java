@@ -35,4 +35,10 @@ public class WorkController {
                                 .build()
                 );
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{name}")
+    public void delete(@PathVariable String name) {
+        workService.deleteByName(name);
+    }
 }

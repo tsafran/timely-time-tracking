@@ -1,4 +1,4 @@
 export interface DialogData {
-    name: String;
+    name: string;
     endTime: Date;
 }

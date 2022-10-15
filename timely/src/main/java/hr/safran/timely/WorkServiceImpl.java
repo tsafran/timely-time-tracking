@@ -27,6 +27,12 @@ public class WorkServiceImpl implements WorkService{
     public Optional<WorkSessionDTO> save(WorkSession workSession) {
          return Optional.of(workSessionJPARepository.saveAndFlush(workSession)).map(this::mapWorkSessionToDTO);
     }
+
+    @Override
+    public long deleteByName(String name) {
+        return workSessionJPARepository.deleteByName(name);
+    }
+
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
     private WorkSessionDTO mapWorkSessionToDTO (final WorkSession workSession) {
         return new WorkSessionDTO(workSession.getName(), dateFormat.format(workSession.getStartTime()), dateFormat.format(workSession.getEndTime()));
