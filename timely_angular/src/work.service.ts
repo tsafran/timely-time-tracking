@@ -34,6 +34,13 @@ export class WorkService {
     );
   }
 
+  updateWorkSession(workSession: WorkSession): Observable<any> {
+    return this.http.put(this.timelyURL, workSession).pipe(
+      tap(_ => console.log(`updated session ${workSession.name}`)),
+      catchError(this.handleError<any>('updateWorkSession'))
+    );
+  }
+
   deleteSession(session: WorkSession | string): Observable<WorkSession> {
     const name = typeof session === 'string' ? session : session.name;
     const url = `${this.timelyURL}/${name}`;

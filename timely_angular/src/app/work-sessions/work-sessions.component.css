@@ -13,6 +13,11 @@ button {
     padding-left: 5%;
     padding-right: 5%;
 }
+
+td button {
+    float: right;
+}
+
 div {
     width: 60%;
     margin: auto;

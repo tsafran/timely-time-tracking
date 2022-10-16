@@ -18,12 +18,14 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import {MatIconModule} from '@angular/material/icon';
 
 import { FormsModule } from '@angular/forms';
+import { EditDialogComponent } from './edit-dialog/edit-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WorkSessionsComponent,
-    ProjectDialogComponent
+    ProjectDialogComponent,
+    EditDialogComponent
   ],
   imports: [
     BrowserModule,

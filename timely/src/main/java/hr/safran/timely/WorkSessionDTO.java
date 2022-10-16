@@ -8,6 +8,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class WorkSessionDTO {
+    private final Integer id;
     private final String name;
     private final String startTime;
     private final String endTime;

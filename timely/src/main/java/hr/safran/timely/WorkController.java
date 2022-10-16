@@ -25,13 +25,28 @@ public class WorkController {
     public ResponseEntity<WorkSessionDTO> save (@RequestBody final WorkSession workSession) {
         return workService.save(workSession)
                 .map(
-                        WorkSessionDTO -> ResponseEntity
+                        workSessionDTO -> ResponseEntity
                                 .status(HttpStatus.CREATED)
-                                .body(WorkSessionDTO)
+                                .body(workSessionDTO)
                 )
                 .orElseGet(
                         () -> ResponseEntity
                                 .status(HttpStatus.CONFLICT)
+                                .build()
+                );
+    }
+
+    @PutMapping
+    public ResponseEntity<WorkSessionDTO> update (@RequestBody final WorkSession workSession) {
+        return workService.update(workSession)
+                .map(
+                        workSessionDTO -> ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body(workSessionDTO)
+                )
+                .orElseGet(
+                        () -> ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
                                 .build()
                 );
     }

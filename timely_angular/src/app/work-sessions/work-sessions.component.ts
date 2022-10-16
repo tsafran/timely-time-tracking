@@ -6,6 +6,7 @@ import { ProjectDialogComponent } from '../project-dialog/project-dialog.compone
 import { MatTableDataSource } from '@angular/material/table';
 import { WorkSessionRow } from 'src/workSession';
 import { MatPaginator } from '@angular/material/paginator';
+import { EditDialogComponent } from '../edit-dialog/edit-dialog.component';
 
 
 @Component({
@@ -48,7 +49,7 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
       this.dataSource.data = this.sessions;
   }
 
-  delete(row: WorkSessionRow): void {
+  deleteSession(row: WorkSessionRow): void {
     if (row.name != '...'){
       this.workService.deleteSession(row.name).subscribe(_ => this.getSessions());
     } else {
@@ -58,6 +59,11 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
       }
     }
     this.refreshStartButton(); 
+  }
+
+  updateSession(row: WorkSessionRow): void {
+    this.workService.updateWorkSession({id: row.id, name: row.name, startTime: this.dateToISO(row.startTime).toJSON(), endTime: this.dateToISO(row.endTime).toJSON()})
+    .subscribe(_ => this.getSessions());
   }
 
   refreshStartButton(): void {
@@ -78,20 +84,18 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
         {name: "...", startTime: this.formatDate(this.currentStart), endTime: "...", duration: "..."} as WorkSessionRow);
     } 
     else {
-      this.openDialog();
+      this.openStopDialog();
     }
     this.isRecording = !this.isRecording; 
     this.dataSource.data = this.sessions
     this.refreshStartButton();
   }
 
-  openDialog(): void{
+  openStopDialog(): void{
     const dialogConfig = new MatDialogConfig();
-
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = true;
     dialogConfig.data = {name: "", endTime: Date};
-
     const dialogRef = this.dialog.open(ProjectDialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe(result => {
@@ -101,6 +105,21 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
       .subscribe(_ => this.getSessions());
       this.refreshStartButton();
     })
+  }
+
+  openEditDialog(row: WorkSessionRow): void {
+    if (row.name != '...') {
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.disableClose = true;
+      dialogConfig.autoFocus = true;
+      dialogConfig.data = {name: row.name};
+      const dialogRef = this.dialog.open(EditDialogComponent, dialogConfig);
+
+      dialogRef.afterClosed().subscribe(result => {
+        row.name = result.name;
+        this.updateSession(row);
+      })
+    }
   }
 
   padDigits(num: number) {
@@ -120,6 +139,14 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
         this.padDigits(date.getMinutes()),
       ].join(':')
     );
+  }
+
+  dateToISO(s: String) {
+    const[date, time] = s.split(' ');
+    const[D, M, Y] = date.split('.');
+    const[h, m] = time.split(':');
+    const d1 = new Date(+Y, +M - 1, +D, +h, +m, +0);
+    return d1;
   }
 
   timeBetweenDates(s1: string, s2: string){
