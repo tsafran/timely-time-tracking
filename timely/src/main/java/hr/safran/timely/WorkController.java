@@ -51,9 +51,15 @@ public class WorkController {
                 );
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{name}")
-    public void delete(@PathVariable String name) {
-        workService.deleteByName(name);
+    public ResponseEntity delete(@PathVariable String name) {
+        if (workService.deleteByName(name) > 0) {
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .build();
+        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .build();
     }
 }

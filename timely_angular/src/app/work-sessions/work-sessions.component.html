@@ -2,7 +2,7 @@
 
 <button mat-raised-button color="{{buttonColor}}" (click) = "toggleStart()">{{buttonText}}</button>
 
-<div [hidden]="!sessions.length">
+<div [hidden]="!sessionsRow.length">
 <table mat-table [dataSource] = "dataSource" class="mat-elevation-z8">
 
     <ng-container matColumnDef="project">

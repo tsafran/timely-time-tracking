@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Data
@@ -23,8 +25,8 @@ public class WorkSession implements Serializable {
     private String name;
 
     @Column(name = "start_time")
-    private Date startTime;
+    private ZonedDateTime startTime;
 
     @Column(name = "end_time")
-    private Date endTime;
+    private ZonedDateTime endTime;
 }

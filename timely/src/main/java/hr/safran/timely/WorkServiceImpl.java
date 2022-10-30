@@ -1,10 +1,15 @@
 package hr.safran.timely;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.Period;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,7 +23,7 @@ public class WorkServiceImpl implements WorkService{
 
     @Override
     public List<WorkSessionDTO> findAll() {
-        return workSessionJPARepository.findAll().stream()
+        return workSessionJPARepository.findAllByOrderByStartTimeDesc().stream()
                 .map(this::mapWorkSessionToDTO)
                 .collect(Collectors.toList());
     }
@@ -57,8 +62,20 @@ public class WorkServiceImpl implements WorkService{
         return workSessionJPARepository.deleteByName(name);
     }
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    private String findDuration (ZonedDateTime d1, ZonedDateTime d2) {
+        long diff = Date.from(d2.toInstant()).getTime() - Date.from(d1.toInstant()).getTime();
+        long minutes = TimeUnit
+                .MILLISECONDS
+                .toMinutes(diff)
+                %60;
+        long hours = TimeUnit
+                .MILLISECONDS
+                .toHours(diff)
+                %60;
+        return String.format("%02d", hours) + ":" + String.format("%02d", minutes);
+    }
+
     private WorkSessionDTO mapWorkSessionToDTO (final WorkSession workSession) {
-        return new WorkSessionDTO(workSession.getId(), workSession.getName(), dateFormat.format(workSession.getStartTime()), dateFormat.format(workSession.getEndTime()));
+        return new WorkSessionDTO(workSession.getId(), workSession.getName(), workSession.getStartTime(), workSession.getEndTime(), findDuration(workSession.getStartTime(), workSession.getEndTime()));
     }
 }

@@ -16,7 +16,8 @@ import { EditDialogComponent } from '../edit-dialog/edit-dialog.component';
 })
 export class WorkSessionsComponent implements OnInit, AfterViewInit {
 
-  sessions: WorkSessionRow[] = [];
+  sessionsRow: WorkSessionRow[] = [];
+  sessions: WorkSession[] = [];
   currentStart: Date = new Date(0);
   currentStop: Date = new Date(0);
   currentName: String = "";
@@ -28,7 +29,7 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   displayedColumns: String[] = ['project', 'startTime', 'endTime', 'duration', 'action'];
-  dataSource = new MatTableDataSource<WorkSessionRow>(this.sessions);
+  dataSource = new MatTableDataSource<WorkSessionRow>(this.sessionsRow);
 
   constructor(private workService: WorkService, private dialog: MatDialog) { }
 
@@ -43,10 +44,12 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
   getSessions(): void{
     this.workService.getWorkSessions()
       .subscribe(sessions => {
-        this.sessions = sessions.map(session => ({...session, duration: this.timeBetweenDates(session.startTime, session.endTime)}))
-        this.dataSource.data = this.sessions
+        this.sessionsRow = sessions
+        .map(session => ({...session, startTime: this.formatDate(new Date(session.startTime)), endTime: this.formatDate(new Date(session.endTime))}));
+        this.dataSource.data = this.sessionsRow;
+        this.sessions = sessions;
       });
-      this.dataSource.data = this.sessions;
+      this.dataSource.data = this.sessionsRow;
   }
 
   deleteSession(row: WorkSessionRow): void {
@@ -62,8 +65,12 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
   }
 
   updateSession(row: WorkSessionRow): void {
-    this.workService.updateWorkSession({id: row.id, name: row.name, startTime: this.dateToISO(row.startTime).toJSON(), endTime: this.dateToISO(row.endTime).toJSON()})
+    let newSession = this.sessions.find(i => i.id === row.id);
+    if (newSession) {
+      this.workService.updateWorkSession({...newSession, name: row.name})
     .subscribe(_ => this.getSessions());
+    }
+    
   }
 
   refreshStartButton(): void {
@@ -80,14 +87,14 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
   toggleStart(): void{
     if(!this.isRecording) {
       this.currentStart = new Date;
-      this.sessions.push(
+      this.sessionsRow.unshift(
         {name: "...", startTime: this.formatDate(this.currentStart), endTime: "...", duration: "..."} as WorkSessionRow);
     } 
     else {
       this.openStopDialog();
     }
     this.isRecording = !this.isRecording; 
-    this.dataSource.data = this.sessions
+    this.dataSource.data = this.sessionsRow
     this.refreshStartButton();
   }
 
@@ -101,7 +108,7 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(result => {
       this.currentName = result.name;
       this.currentStop = result.endTime;
-      this.workService.addWorkSession({name: this.currentName, startTime: this.currentStart.toJSON(), endTime: this.currentStop.toJSON()} as WorkSession)
+      this.workService.addWorkSession({name: this.currentName, startTime: this.currentStart, endTime: this.currentStop} as WorkSession)
       .subscribe(_ => this.getSessions());
       this.refreshStartButton();
     })
@@ -140,37 +147,4 @@ export class WorkSessionsComponent implements OnInit, AfterViewInit {
       ].join(':')
     );
   }
-
-  dateToISO(s: String) {
-    const[date, time] = s.split(' ');
-    const[D, M, Y] = date.split('.');
-    const[h, m] = time.split(':');
-    const d1 = new Date(+Y, +M - 1, +D, +h, +m, +0);
-    return d1;
-  }
-
-  timeBetweenDates(s1: string, s2: string){
-
-    const[date1, time1] = s1.split(' ');
-    const[date2, time2] = s2.split(' ');
-
-    const[D1, M1, Y1] = date1.split('.');
-    const[D2, M2, Y2] = date2.split('.');
-    const[h1, m1] = time1.split(':');
-    const[h2, m2] = time2.split(':');
-
-    const d1 = new Date(+Y1, +M1 - 1, +D1, +h1, +m1, +0);
-    const d2 = new Date(+Y2, +M2 - 1, +D2, +h2, +m2, +0);
-
-    const msBetweenDates = d2.getTime() - d1.getTime();
-    let seconds = Math.floor(msBetweenDates / 1000);
-    let minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-
-    seconds = seconds % 60;
-    minutes = minutes % 60;
-
-    return ([this.padDigits(hours), this.padDigits(minutes)].join(':'));
-  }
-
 }
